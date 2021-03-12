@@ -1,8 +1,6 @@
 # Exercise 2 - Installing Istio on IBM Cloud Kubernetes Service
 
-In this module, you will use the Managed Istio add-on to install Istio on your cluster.
-
-Managed Istio is available as part of IBM Cloud™ Kubernetes Service. The service provides seamless installation of Istio, automatic updates and lifecycle management of control plane components, and integration with platform logging and monitoring tools.
+We will be installing Istio using the Istio Operator. The Istio operator will manage the installation for you instead of you manually installing, upgrading, and uninstalling Istio on your cluster.
 
 1. Download the `istioctl` CLI and add it to your PATH:
 
@@ -14,47 +12,51 @@ Managed Istio is available as part of IBM Cloud™ Kubernetes Service. The servi
    export PATH=$PWD/istio-1.5.6/bin:$PATH
    ```
 
-1. Enable Managed Istio on your IKS cluster:
+1. Deploy the Istio operator:
 
     ```shell
-    ibmcloud ks cluster addon enable istio --cluster $MYCLUSTER
+    istioctl operator init
     ```
 
-1. The install can take up to 10 minutes. Ensure the corresponding pods are all in **`Running`** state before you continue.
+1.  Install the Istio `demo` configuration profile using the operator:
 
     ```shell
-    kubectl get pods -n istio-system
+    $ kubectl create ns istio-system
+    $ kubectl apply -f - <<EOF 
+    apiVersion: install.istio.io/v1alpha1
+    kind: IstioOperator
+    metadata:
+        namespace: istio-system
+        name: example-istiocontrolplane
+        spec:
+            profile: demo
+    EOF
     ```
 
-    Sample output:
+1. The install will take just a couple minutes. Give the operator a few minutes to start installing the pods in the following command. Verify the installation is complete by checking for the pods in the `istio-system` namespace.
 
     ```shell
-    NAME                                     READY   STATUS    RESTARTS   AGE
-
-istio-egressgateway-6c966469cc-52t6f    1/1     Running   0          69s
-istio-egressgateway-6c966469cc-qq5qd    1/1     Running   0          55s
-istio-ingressgateway-7698c7b4f4-69c24   1/1     Running   0          68s
-istio-ingressgateway-7698c7b4f4-qttzh   1/1     Running   0          54s
-istiod-cbb98c74d-2wvql                  1/1     Running   0          54s
-istiod-cbb98c74d-kcr4d                  1/1     Running   0          67s
+    $ kubectl get pods -n istio-system
+    NAME                                   READY   STATUS    RESTARTS   AGE
+    grafana-5cc7f86765-xzrxj               1/1     Running   0          17m
+    istio-egressgateway-866795b5d7-s8dlp   1/1     Running   0          17m
+    istio-ingressgateway-f476fdd5-pwnrz    1/1     Running   0          17m
+    istio-tracing-8584b4d7f9-54rxg         1/1     Running   0          16m
+    istiod-6684498666-ptktr                1/1     Running   0          17m
+    kiali-696bb665-bcbv8                   1/1     Running   0          16m
+    prometheus-b665549dc-h69cd             2/2     Running   0          16m
     ```
 
-> **NOTE** Before you continue, make sure all the pods are deployed and either in the **`Running`** or **`Completed`** state. If they're in `pending` state, wait a few minutes to let the installation and deployment finish.
+    Before you continue, make sure all the pods are deployed and either in the **`Running`** state. 
 
-1. Check the version of your Istio:
-
+2. Check the version of your Istio:
     ```shell
     istioctl version
     ```
-
     Sample output:
-
     ```shell
     client version: 1.5.6
     control plane version: 1.5.6
     data plane version: 1.5.6 (4 proxies)
     ```
-
     Congratulations! You successfully installed Istio into your cluster.
-
-## [Continue to Exercise 3 - Deploy Guestbook with Istio Proxy](../exercise-3/README.md)

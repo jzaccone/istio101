@@ -140,50 +140,13 @@ The Redis database is a service that you can use to persist the data of your app
 
     ```shell
     NAME                            READY   STATUS    RESTARTS   AGE
-    guestbook-v1-98dd9c654-dz8dq    2/2     Running   0          30s
-    guestbook-v1-98dd9c654-mgfv6    2/2     Running   0          30s
-    guestbook-v1-98dd9c654-x8gxx    2/2     Running   0          30s
-    guestbook-v2-8689f6c559-5ntgv   2/2     Running   0          28s
-    guestbook-v2-8689f6c559-fpzb7   2/2     Running   0          28s
-    guestbook-v2-8689f6c559-wqbnl   2/2     Running   0          28s
-    redis-master-577bc6fbb-zh5v8    2/2     Running   0          4m47s
-    redis-slave-7779c6f75b-bshvs    2/2     Running   0          4m46s
-    redis-slave-7779c6f75b-nvsd6    2/2     Running   0          4m46s
+    guestbook-v1-697bf596cf-n5xmx   2/2     Running   0          17m
+    guestbook-v2-f9f597d8d-9cf98    2/2     Running   0          17m
+    redis-master-68857cd57c-s6z2p   2/2     Running   0          18m
+    redis-slave-7779c6f75b-njcpr    2/2     Running   0          18m
+    redis-slave-7779c6f75b-xtbb6    2/2     Running   0          18m
     ```
 
     Note that each guestbook pod has 2 containers in it. One is the guestbook container, and the other is the Envoy proxy sidecar.
 
-## Use Watson Tone Analyzer
-
-Watson Tone Analyzer detects the tone from the words that users enter into the Guestbook app. The tone is converted to the corresponding emoticons.
-
-1. Create Watson Tone Analyzer in your account.
-
-    ```shell
-    ibmcloud resource service-instance-create my-tone-analyzer-service tone-analyzer lite us-south
-    ```
-
-1. Create the service key for the Tone Analyzer service. This command should output the credentials you just created. You will need the value for **apikey** & **url** later.
-
-    ```shell
-    ibmcloud resource service-key-create tone-analyzer-key Manager --instance-name my-tone-analyzer-service
-    ```
-
-1. If you need to get the service-keys later, you can use the following command:
-
-    ```shell
-    ibmcloud resource service-key tone-analyzer-key
-    ```
-
-1. Open the `analyzer-deployment.yaml` and find the env section near the end of the file. Replace `YOUR_API_KEY` with your own API key, and replace `YOUR_URL` with the url value you saved before. YOUR_URL should look something like `https://gateway.watsonplatform.net/tone-analyzer/api`. Save the file.
-
-1. Deploy the analyzer pods and service, using the `analyzer-deployment.yaml` and `analyzer-service.yaml` files found in the `guestbook/v2` directory. The analyzer service talks to Watson Tone Analyzer to help analyze the tone of a message. Ensure you are still in the `guestbook/v2` directory.
-
-    ```shell
-    kubectl apply -f analyzer-deployment.yaml
-    kubectl apply -f analyzer-service.yaml
-    ```
-
-Great! Your guestbook app is up and running. In Exercise 4, you'll be able to see the app in action by directly accessing the service endpoint. You'll also be able to view Telemetry data for the app.
-
-## [Continue to Exercise 4 - Telemetry](../exercise-4/README.md)
+Great! Your guestbook app is up and running. In the next exercise you will expose the Istio service mesh with the Ingress Gateway
